@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Daylight Atmospheric Precision Weather Dashboard">
+  <title>Weather Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <!-- Sidebar for Desktop -->
+    <aside class="sidebar desktop-only">
+      <div class="brand">
+        <h1>WEATHER</h1>
+        <p>ATMOSPHERIC PRECISION</p>
+      </div>
+      <nav class="side-nav">
+        <a href="#" class="nav-item active">
+          <i class="fa-solid fa-border-all"></i>
+          <span>DASHBOARD</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i class="fa-regular fa-map"></i>
+          <span>MAPS</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i class="fa-regular fa-bell"></i>
+          <span>ALERTS</span>
+        </a>
+        <a href="#" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>SETTINGS</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <form id="search-form" class="search-form">
+          <div class="search-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="city-input" placeholder="Search city, zip, or airport" required autocomplete="off">
+          </div>
+        </form>
+
+        <div class="top-bar-right">
+          <!-- Unit Toggle Added Here -->
+          <div class="unit-toggle" id="unit-toggle-container">
+            <span class="unit-option active" id="btn-c">°C</span>
+            <span class="unit-option" id="btn-f">°F</span>
+          </div>
+          <!-- Dark Mode Toggle -->
+          <button class="icon-btn theme-toggle-btn" id="theme-toggle" aria-label="Toggle Dark Mode">
+            <i class="fa-regular fa-moon" id="theme-icon"></i>
+          </button>
+
+          <button class="icon-btn bell-btn">
+            <i class="fa-regular fa-bell"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Loading and Error Overlays -->
+      <div id="loading-overlay" class="overlay hidden">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <p>Fetching Atmospheric Data...</p>
+      </div>
+      <div id="error-overlay" class="overlay hidden">
+        <p id="error-message"></p>
+        <button id="retry-btn" class="retry-btn">Dismiss</button>
+      </div>
+
+      <!-- Dashboard Elements -->
+      <div class="dashboard-scrollable" id="weather-dashboard">
+
+        <!-- Main Weather Banner -->
+        <section class="banner-section">
+          <div class="weather-banner">
+            <div class="banner-content">
+              <div class="location-chip">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="banner-location">FLORIDA, US</span>
+              </div>
+              <div class="banner-main">
+                <h2 class="huge-temp" id="banner-temp">28<span class="deg-sym">°</span><span class="unit-sym">C</span>
+                </h2>
+                <div class="banner-desc">
+                  <i id="banner-icon" class="fa-solid fa-cloud-showers-heavy"></i>
+                  <div>
+                    <h3 id="banner-condition">Rainy Storm Clouds</h3>
+                    <p id="banner-subtext">Expect thunderstorms in the late afternoon.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="nearby-locations desktop-only">
+              <h4>NEARBY LOCATIONS</h4>
+              <ul id="nearby-locations-list">
+                <!-- Injected via JS -->
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hourly Forecast -->
+        <section class="hourly-section">
+          <div class="section-header">
+            <h3>Hourly Forecast</h3>
+          </div>
+          <div class="forecast-scroller" id="hourly-container">
+            <!-- Hourly cards injected via JS -->
+          </div>
+        </section>
+
+        <!-- 14-Day Forecast -->
+        <section class="forecast-section">
+          <div class="section-header">
+            <h3>14-Day Forecast</h3>
+            <a href="#" class="view-link">Monthly View &gt;</a>
+          </div>
+          <div class="forecast-scroller" id="forecast-container">
+            <!-- Forecast cards injected via JS -->
+          </div>
+        </section>
+
+        <!-- Today's Highlights -->
+        <section class="highlights-section">
+          <div class="section-header">
+            <h3>Today's Highlights</h3>
+          </div>
+          <div class="highlights-grid">
+
+            <!-- UV Index -->
+            <div class="highlight-card">
+              <div class="card-top">
+                <h4>UV INDEX</h4>
+                <i class="fa-regular fa-sun"></i>
+              </div>
+              <div class="card-body gauge-body">
+                <div class="gauge-value">
+                  <span class="huge-number" id="hl-uv">6</span>
+                  <span class="badge" id="hl-uv-badge">MODERATE</span>
+                </div>
+                <div class="gauge-bar-container">
+                  <div class="gauge-track"></div>
+                  <div class="gauge-fill" id="uv-fill" style="width: 40%;"></div>
+                  <div class="gauge-knob" id="uv-knob" style="left: 40%;"></div>
+                </div>
+                <div class="gauge-labels">
+                  <span>Low</span>
+                  <span>Extreme</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Wind Status -->
+            <div class="highlight-card">
+              <div class="card-top">
+                <h4>WIND STATUS</h4>
+                <i class="fa-solid fa-wind"></i>
+              </div>
+              <div class="card-body">
+                <div class="main-value">
+                  <span class="huge-number" id="hl-wind">12</span>
+                  <span class="unit-text">km/h</span>
+                </div>
+                <div class="compass-wrapper">
+                  <div class="compass-circle">
+                    <span class="compass-n">N</span>
+                    <i class="fa-regular fa-paper-plane compass-arrow" id="wind-arrow"
+                      style="transform: rotate(45deg);"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Humidity -->
+            <div class="highlight-card">
+              <div class="card-top">
+                <h4>HUMIDITY</h4>
+                <i class="fa-solid fa-droplet"></i>
+              </div>
+              <div class="card-body">
+                <div class="main-value">
+                  <span class="huge-number" id="hl-humidity">82</span>
+                  <span class="unit-text">%</span>
+                </div>
+                <p class="hl-desc">The dew point is <span id="dew-point">16</span>° right now.</p>
+                <div class="simple-bar-container">
+                  <div class="simple-track"></div>
+                  <div class="simple-fill" id="humidity-fill" style="width: 82%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visibility -->
+            <div class="highlight-card">
+              <div class="card-top">
+                <h4>VISIBILITY</h4>
+                <i class="fa-regular fa-eye"></i>
+              </div>
+              <div class="card-body">
+                <div class="main-value">
+                  <span class="huge-number" id="hl-visibility">5.2</span>
+                  <span class="unit-text">km</span>
+                </div>
+                <p class="hl-desc" id="hl-vis-desc">Moderate haze reported near the coast.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Weather Radar -->
+        <section class="radar-section">
+          <div class="section-header desktop-only">
+            <h3>Weather Radar</h3>
+            <div class="pill-toggles">
+              <button class="pill active">Precipitation</button>
+              <button class="pill">Satellite</button>
+            </div>
+          </div>
+          <div class="radar-map-container">
+            <!-- Google Maps embedded map -->
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2803.9782968377235!2d-75.75992017326587!3d45.34925037107235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cce0718cc4a6ad7%3A0xc6cc467725843e2b!2sAlgonquin%20College%20-%20Ottawa%20Campus!5e0!3m2!1sen!2sca!4v1776440248329!5m2!1sen!2sca" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="radar-iframe"></iframe>
+
+            <div class="active-tracking-widget desktop-only">
+              <div class="radar-icon-box">
+                <i class="fa-solid fa-compact-disc fa-spin" style="--fa-animation-duration: 3s;"></i>
+              </div>
+              <div class="tracking-text">
+                <span>ACTIVE TRACKING</span>
+                <strong>Southern Florida Coastline</strong>
+              </div>
+            </div>
+
+            <button class="open-map-btn mobile-only">Open Map</button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <button class="fab-btn">
+      <i class="fa-solid fa-location-crosshairs"></i>
+    </button>
+
+    <!-- Bottom Nav for Mobile -->
+    <nav class="bottom-nav mobile-only">
+      <a href="#" class="nav-item active">
+        <i class="fa-solid fa-border-all"></i>
+        <span>DASHBOARD</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-regular fa-map"></i>
+        <span>MAP</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-regular fa-bell"></i>
+        <span>ALERTS</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>SETTINGS</span>
+      </a>
+    </nav>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
